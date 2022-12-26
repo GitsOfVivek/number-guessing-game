@@ -1,67 +1,60 @@
-let randomNumber = Math.floor(Math.random() * 100) + 1;
-const guesses = document.querySelector(".guesses");
-const lastResult = document.querySelector(".lastResult");
-const lowOrHi = document.querySelector(".lowOrHi");
-const guessSubmit = document.querySelector(".guessSubmit");
-const guessField = document.querySelector(".guessField");
-let guessCount = 1;
-let resetButton;
+'use strict';
 
-function checkGuess() {
-  const userGuess = Number(guessField.value);
-  if (guessCount === 1) {
-    guesses.textContent = "Previous guesses: ";
-  }
+let secretNumber = Math.trunc(Math.random() * 20) + 1;
+let score = 20;
+let highScore = 0;
 
-  guesses.textContent += userGuess + " ";
+const displayMessage = function (message) {
+  document.querySelector('.message').textContent = message;
+};
 
-  if (userGuess === randomNumber) {
-    lastResult.textContent = "Congratulations! You got it right!";
-    lastResult.style.backgroundColor = "green";
-    lowOrHi.textContent = "";
-    setGameOver();
-  } else if (guessCount === 10) {
-    lastResult.textContent = "!!!GAME OVER!!!";
-    lowOrHi.textContent = "";
-    setGameOver();
-  } else {
-    lastResult.textContent = "Wrong!";
-    lastResult.style.backgroundColor = "red";
-    if (userGuess < randomNumber) {
-      lowOrHi.textContent = "Last guess was too low!";
-    } else if (userGuess > randomNumber) {
-      lowOrHi.textContent = "Last guess was too high!";
+document.querySelector('.check').addEventListener('click', function () {
+  const guess = Number(document.querySelector('.guess').value);
+
+  // When there is no input
+  if (!guess) {
+    // document.querySelector('.message').textContent = '⛔ No number!';
+    displayMessage('⛔ No number!');
+
+    // When player wins
+  } else if (guess === secretNumber) {
+    // document.querySelector('.message').textContent = '🎉 Correct Number';
+    displayMessage('🎉 Correct Number');
+    document.querySelector('.number').textContent = secretNumber;
+    document.querySelector('body').style.backgroundColor = '#60b347';
+    document.querySelector('.number').style.width = '30rem';
+
+    if (score > highScore) {
+      highScore = score;
+      document.querySelector('.highscore').textContent = highScore;
+    }
+
+    // Wrong output
+  } else if (guess !== secretNumber) {
+    if (score > 1) {
+      //   document.querySelector('.message').textContent =
+      //     guess > secretNumber ? '📈 Too high!' : '📉 Too low';
+
+      displayMessage(guess > secretNumber ? '📈 Too high!' : '📉 Too low');
+      score--;
+      document.querySelector('.score').textContent = score;
+    } else {
+      //   document.querySelector('.message').textContent = '💥 You lost the game!';
+      displayMessage('💥 You lost the game!');
+      document.querySelector('.score').textContent = 0;
     }
   }
+});
 
-  guessCount++;
-  guessField.value = "";
-  guessField.focus();
-}
+document.querySelector('.again').addEventListener('click', function () {
+  score = 20;
+  secretNumber = Math.trunc(Math.random() * 20) + 1;
+  //   document.querySelector('.message').textContent = 'Start guessing...';
+  displayMessage('Start guessing...');
+  document.querySelector('.score').textContent = score;
+  document.querySelector('.number').textContent = '?';
+  document.querySelector('.guess').value = '';
 
-guessSubmit.addEventListener("click", checkGuess);
-
-function setGameOver() {
-  guessField.disabled = true;
-  guessSubmit.disabled = true;
-  resetButton = document.createElement("button");
-  resetButton.textContent = "Start new game";
-  document.body.appendChild(resetButton);
-  resetButton.addEventListener("click", resetGame);
-}
-
-function resetGame() {
-  guessCount = 1;
-  const resetParas = document.querySelectorAll(".resultParas p");
-  for (const resetPara of resetParas) {
-    resetPara.textContent = "";
-  }
-
-  resetButton.parentNode.removeChild(resetButton);
-  guessField.disabled = false;
-  guessSubmit.disabled = false;
-  guessField.value = "";
-  guessField.focus();
-  lastResult.style.backgroundColor = "white";
-  randomNumber = Math.floor(Math.random() * 100) + 1;
-}
+  document.querySelector('body').style.backgroundColor = '#222';
+  document.querySelector('.number').style.width = '15rem';
+});
